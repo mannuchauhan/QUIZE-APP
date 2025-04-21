@@ -1,0 +1,245 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            background-image: url(https://images.alphacoders.com/135/thumb-1920-1358310.png);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-container {
+            background-color: #f4f4f9;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            text-align: center;
+            box-sizing: border-box;
+            height: 60vh;
+        }
+
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .option:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .timer {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #ff5722;
+        }
+
+        .result {
+            font-size: 1.5em;
+            color: #4caf50;
+            display: none;
+        }
+
+        .restart-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .restart-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quiz-container">
+        <div class="timer">Time Left: <span id="time">40</span>s</div>
+        <div class="question">Question will appear here</div>
+        <div class="options"></div>
+        <div class="result">Your score: <span id="score">0</span></div>
+        <button class="restart-btn">Restart Quiz</button>
+    </div>
+    <script>
+        const quizData = [
+
+            {
+                question: "What is the purpose of <head> tag in html",
+                options: ["To define the body of the document", "To define the haeder of document", "To define the metadata about the document", "To define the footer of the document"],
+                answer: "To define the metadata about the document"
+            },
+            {
+                question: "Which language is used for web development?",
+                options: ["Python", "HTML", "Java", "C++"],
+                answer: "HTML"
+            },
+            {
+                question: "Which HTML element is used to create a hypertext",
+                options: ["<url>", "<href>", "<link>", "<a>"],
+                answer: "<a>"
+            },
+            {
+                question: "How do you write a function in javascript",
+                options: ["fn myFunction() {}", "fun myFunction() {} ", "def myFunction() {}", "function myFunction() {}"],
+                answer: "function myFunction() {}"
+            },
+            {
+                question: "Which CSS property makes text bold?",
+                options: ["bold", "font-style", "font-weight", "text-decoraton"],
+                answer: "Bold"
+            },
+            {
+                question: "Which java script data type is used to represent a collection of key-value pairs?",
+                options: ["Number", "String", "Object", "Array"],
+                answer: "Obeject"
+            },
+
+            {
+                question: "Which HTML attribute is used to specify the url of an obeject?",
+                options: ["href", "alt", "title", "src"],
+                answer: "src"
+            },
+
+            {
+                question: "Which javascript method is used to add an element to the end of an array?",
+                options: ["unshift()", "shifts()", "pop()", "push()"],
+                answer: "push()"
+            },
+
+            {
+                question: "Which HTML attribute is used to specify the type of input field?",
+                options: ["palceholder", "value", "type", "name"],
+                answer: "type"
+            },
+
+            {
+                question: "Which CSS property is used is used to set the opacity of an element?",
+                options: ["z-index", "display", "opacity", "visibility"],
+                answer: "opacity"
+            },
+
+            {
+                question: "What is the purpose of JSON.parse() method in javascript?",
+                options: ["To parse CSS code", "To parse HTML code", "To convert a JASON sring to a javaScript object", "To convert of JSONScript object"],
+                answer: "To convert a JASON sring to a javaScript object"
+            },
+
+
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 40;
+        let timerInterval;
+        const timerEl = document.getElementById('time');
+        const questionEl = document.querySelector('.question');
+        const optionsEl = document.querySelector('.options');
+        const resultEl = document.querySelector('.result');
+        const scoreEl = document.getElementById('score');
+        const restartBtn = document.querySelector('.restart-btn');
+
+        // Function to load the question
+        function loadQuestion() {
+            if (currentQuestion >= quizData.length) {
+                endQuiz();
+                return;
+            }
+            clearInterval(timerInterval);
+            timeLeft = 40;
+            timerEl.textContent = timeLeft;
+            startTimer();
+            const currentQuiz = quizData[currentQuestion];
+            questionEl.textContent = currentQuiz.question;
+            optionsEl.innerHTML = ''; // Clear previous options
+            currentQuiz.options.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option);
+                optionsEl.appendChild(button);
+            });
+        }
+
+        // Check the answer
+        function checkAnswer(selectedOption) {
+            if (selectedOption === quizData[currentQuestion].answer) {
+                score++;
+            }
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Start the timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        // End the quiz and show the results
+        function endQuiz() {
+            clearInterval(timerInterval);
+            questionEl.style.display = 'none';
+            optionsEl.style.display = 'none';
+            resultEl.style.display = 'block';
+            scoreEl.textContent = score;
+            restartBtn.style.display = 'block';
+        }
+
+        // Restart the quiz
+        restartBtn.addEventListener('click', () => {
+            // Reset variables
+            currentQuestion = 0;
+            score = 0;
+            timeLeft = 40;
+            timerEl.textContent = timeLeft;
+
+            // Reset the display
+            questionEl.style.display = 'block';
+            optionsEl.style.display = 'flex'; // Ensure options are displayed correctly
+            resultEl.style.display = 'none';
+            restartBtn.style.display = 'none';
+
+            // Load the first question
+            loadQuestion();
+        });
+
+        // Initialize the quiz with the first question
+        loadQuestion();
+    </script>
+</body>
+
+</html>
